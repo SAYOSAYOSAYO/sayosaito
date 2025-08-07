@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>m3u8動画再生サイト</title>
+  <style>
+    body {
+      background: #f4f6fa;
+      font-family: 'Segoe UI', 'Meiryo', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 32px;
+    }
+    h1 {
+      text-align: center;
+      color: #2d7be5;
+      margin-bottom: 24px;
+      font-size: 2rem;
+    }
+    #urlForm {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+      align-items: center;
+    }
+    #m3u8url {
+      width: 90%;
+      padding: 8px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #bcdffb;
+      background: #f7fbff;
+    }
+    button {
+      background: #2d7be5;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 28px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #195cae;
+    }
+    .note {
+      text-align: center;
+      color: #888;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 18px 0;
+    }
+    .footer {
+      text-align: center;
+      color: #aaa;
+      margin-top: 32px;
+      font-size: 0.9rem;
+    }
+    video {
+      margin: 0 auto;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>m3u8動画再生サイト</h1>
+    <div class="note">m3u8形式の動画URLを入力して「読み込む」を押してください。</div>
+    <form id="urlForm">
+      <label for="m3u8url">動画URL：</label>
+      <input type="text" id="m3u8url" value="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
+      <button type="submit">読み込む</button>
+    </form>
+    <div class="controls">
+      <button id="backward">⏪ 10秒戻す</button>
+      <button id="forward">10秒進める ⏩</button>
+    </div>
+    <video
+      id="my-video"
+      controls
+      width="640"
+      height="360"
+      preload="auto">
+    </video>
+    <div class="footer">
+      &copy; 2025 m3u8動画再生サイト
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    function loadVideo(url) {
+      var video = document.getElementById('my-video');
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+      } else if (Hls.isSupported()) {
+        if (window.hls) window.hls.destroy();
+        window.hls = new Hls();
+        window.hls.loadSource(url);
+        window.hls.attachMedia(video);
+      } else {
+        alert('このブラウザではm3u8再生に対応していません。');
+      }
+      video.load();
+      video.play();
+    }
+
+    document.getElementById('urlForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var url = document.getElementById('m3u8url').value;
+      loadVideo(url);
+    });
+
+    document.getElementById('backward').addEventListener('click', function() {
+      var video = document.getElementById('my-video');
+      video.currentTime = Math.max(0, video.currentTime - 10);
+    });
+
+    document.getElementById('forward').addEventListener('click', function() {
+      var video = document.getElementById('my-video');
+      video.currentTime = Math.min(video.duration, video.currentTime + 10);
+    });
+
+    window.onload = function() {
+      var url = document.getElementById('m3u8url').value;
+      loadVideo(url);
+    };
+  </script>
+</body>
+</html>
